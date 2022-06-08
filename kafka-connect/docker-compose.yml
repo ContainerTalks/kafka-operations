@@ -86,7 +86,7 @@ services:
         #
         sleep infinity
   elasticsearch:
-    container_name: staging_elasticsearch
+    container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
     user: elasticsearch
     environment:
