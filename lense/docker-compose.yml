@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  lenses:
+    image: lensesio/lenses:5.0
+    container_name: lenses
+    environment:
+      LENSES_PORT: 9991
+      LENSES_SECURITY_USER: admin
+      LENSES_SECURITY_PASSWORD: admin
+    ports:
+      - 9991:9991
+      - 9102:9102
