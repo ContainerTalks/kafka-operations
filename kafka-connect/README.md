@@ -6,124 +6,91 @@
 cd kafka-connect/
 docker-compose up -d
 ```
+# Kafka Connect - Prod
 
-# Verify the Connector Plugins
+..... yet to write
 
-- FIND THE SPECIFIC PLUGINS INSTALLED
+# Kafka Connect - Staging 
+
+## Run Kafka Connect 
+
+To run the kafka connect we need to create the `.env` file in the server with 
+```env
+AWS_ACCESS_KEY=dummy
+AWS_SECRET_KEY=dummy
+```
+This keys are having the access to required bucket.
+
+- Run the container with the following
+
 ```bash
-curl -s localhost:8083/connector-plugins|jq '.[].class'| egrep 'ElasticsearchSinkConnector'
+cd wsrepo/docker/kafka-connect/
+docker-compose up -d
 ```
 
-- FIND ALL THE PLUGINS INSTALLED
+- Plugins API
+
+Install plugins 
+
 ```bash
-curl -s localhost:8083/connector-plugins|jq '.[].class'
+confluent-hub install --no-prompt confluentinc/kafka-connect-s3-source:latest
+confluent-hub install --no-prompt confluentinc/kafka-connect-elasticsearch:5.3.0
+```
+```bash
+# To know the specific plugins
+curl -s localhost:8083/connector-plugins|jq '.[].class'| egrep 'ElasticsearchSinkConnector|S3SourceConnector'
+
+# List all the plugins
+curl 'localhost:8083/connector-plugins'
 ```
 
-## Stream Data from S3 to Kafka
+
+## Create the connectors
+
+- Create s3 to kafka connector  for the given bucket json files path `wisestepstaging/candidate-data-migration/candidatesearchindex/`
 
 ```bash
-curl -i -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/test-s3-json-to-kafka/config -d '{
-        "name": "test-s3-json-to-kafka",
+# Post / Create the connector
+curl -i -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/candidatesearch-data/config -d '{
+        "name": "candidatesearch-data",
         "connector.class": "io.confluent.connect.s3.source.S3SourceConnector",
         "tasks.max": "1",
         "value.converter": "org.apache.kafka.connect.json.JsonConverter",
         "mode": "GENERIC",
-        "topics.dir": "jsonTest",
-        "confluent.topic.bootstrap.servers": "broker:29092",
+        "topics.dir": "candidate-data-migration",
+        "confluent.topic.bootstrap.servers": "192.31.2.108:19092",
         "confluent.topic.replication.factor": "1",
         "format.class": "io.confluent.connect.s3.format.json.JsonFormat",
-        "topic.regex.list": "test_topic:.*",
-        "s3.bucket.name": "test-kafka-connect-bucket-balu-test",
-        "s3.region": "ap-south-1",
+        "topic.regex.list": "candidatesearchindex:.*",
+        "s3.bucket.name": "wisestepstaging",
+        "s3.region": "us-east-1",
         "s3.credentials.provider.class": "com.amazonaws.auth.EnvironmentVariableCredentialsProvider",
         "value.converter.schemas.enable": "false"
     }'
 ```
 
-### Check the status of the connectors
+> Check the topic name `candidatesearchindex` with `--list` API in broker and run console consumer to know the messages. If no momenet is 
 
-- List the container 
-
-`curl -X GET "localhost:8083/connectors"`
-
-- Delete the connector
-
-`curl -X DELETE  "http://localhost:8083/connectors/<CONNECTOR_NAME>"`
-
-
-curl 'localhost:8083/connector-plugins'
-
-
-## Stream Data from Kafka to Elasticsearch
-
-docker exec -it broker kafka-console-producer --broker-list broker:9092 --topic test-elasticsearch-sink-2 < sample.json
-
-cat <<EOF>> sample.json
-{"f1": "value1"}
-{"f1": "value2"}
-{"f1": "value3"}
-EOF
-
+- Create the kafka to es connector
 
 ```bash
+# Post / Create the connector
 curl -i -X PUT -H  "Content-Type:application/json" \
-    http://localhost:8083/connectors/elasticsearch-sink/config \
+    http://localhost:8083/connectors/candidatesearch-data-index/config \
     -d '{
-        "name": "elasticsearch-sink",
-        "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
-        "tasks.max": "1",
-        "topics" : "test_topic", 
-        "topic.index.map" : "test_topic:test_topic_index",
-        "connection.url": "http://elasticsearch:9200",
-        "type.name": "log",
-        "key.ignore": "true",
-        "schema.ignore" : "true"
-  }'
-```
-
-
- "type.name" : "event",
-    "key.ignore" : "false",
-    "schema.ignore" : "true",
-    "schemas.enable" : "false",
-    "auto.create.indices.at.start": "true",
+    "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+    "tasks.max": "1",
+    "topics" : "candidatesearchindex", 
+    "topic.index.map" : "candidatesearchindex:candidatesearch-index",
+    "connection.url": "http://192.31.2.108:9200",
+    "type.name": "log",
     "key.ignore": "true",
-    "name": "test-2",
-    "transforms": "addSuffix",  
-    "transforms.addSuffix.type": "org.apache.kafka.connect.transforms.RegexRouter",
-    "transforms.addSuffix.regex": "test_topic.*",
-    "transforms.addSuffix.replacement": "test_topic"
- 
-### Produce the Message to topic
-
-docker exec -it broker kafka-console-producer --topic test_topic --broker-list broker:9092
-
-
-curl -XGET 'localhost:9200/test_topic_index/_search?pretty'
-
-   
-
-
-## View the topic in the CLI:
-
-docker exec -it broker kafka-topics --list --bootstrap-server broker:9092
-
-
-docker exec -it broker  kafka-console-consumer --bootstrap-server broker:9092 --topic test_topic --from-beginning
-
-
-
-```bash
-    docker exec kafkacat kafkacat \
-            -b broker:29092 \
-            -r http://schema-registry:8081 \
-            -s json \
-            -t test_topic
+    "schema.ignore" : "true"
+}'
 ```
 
 
-## Elasticsearch 
 
-```bash
-curl -X GET "localhost:9200/_cat/indices?v" 
-```
+## Ref:
+
+- https://sematext.com/blog/kafka-connect-elasticsearch-how-to/ 
