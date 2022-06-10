@@ -91,8 +91,8 @@ services:
     hostname: elasticsearch
     environment:
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-      - cluster.name=wsindex
-      - node.name="ws-es-one"
+      - cluster.name=vibhuvi-es
+      - node.name="vibhuvi-es-one"
       - network.bind_host=0.0.0.0
       - node.master=true
       - discovery.type=single-node

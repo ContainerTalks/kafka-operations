@@ -2,14 +2,14 @@
 version: '2'
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:6.2.0
+    image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
   broker:
-    image: confluentinc/cp-kafka:6.2.0
+    image: confluentinc/cp-kafka:latest
     container_name: broker
     depends_on:
       - zookeeper
@@ -28,7 +28,7 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 100
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:6.2.0
+    image: confluentinc/cp-schema-registry:latest
     container_name: schema-registry
     ports:
       - "8081:8081"
@@ -39,7 +39,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: broker:29092
 
   kafka-connect:
-    image: confluentinc/cp-kafka-connect-base:6.2.0
+    image: confluentinc/cp-kafka-connect-base:latest
     container_name: kafka-connect
     depends_on:
       - broker
@@ -103,7 +103,7 @@ services:
       KSQL_KSQL_HIDDEN_TOPICS: '^_.*'
 
   control-center:
-    image: confluentinc/cp-enterprise-control-center:6.2.0
+    image: confluentinc/cp-enterprise-control-center:latest
     container_name: control-center
     depends_on:
       - broker
@@ -134,13 +134,13 @@ services:
         sleep 120  
         /etc/confluent/docker/run
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.2.2
     container_name: elasticsearch
     hostname: elasticsearch
     environment:
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-      - cluster.name=wsindex
-      - node.name="ws-es-one"
+      - cluster.name=vibhuvi-es
+      - node.name="vibhuvi-es-one"
       - network.bind_host=0.0.0.0
       - node.master=true
       - discovery.type=single-node
@@ -156,7 +156,7 @@ services:
       timeout: 10s
       retries: 5
   kibana:
-    image: docker.elastic.co/kibana/kibana:6.4.2
+    image: docker.elastic.co/kibana/kibana:8.2.2
     container_name: kibana
     hostname: kibana
     depends_on:
@@ -180,10 +180,10 @@ services:
         echo -e "\t" $$(date) " Kibana saved objects request response: " $$(curl -H 'kbn-xsrf: true' -o /dev/null -w %{http_code} -s http://localhost:5601/api/saved_objects/_find?type=index-pattern&search_fields=title&search=*) $$(curl -H 'kbn-xsrf: true' -s http://localhost:5601/api/saved_objects/_find?type=index-pattern&search_fields=title&search=*)
 
         echo -e "\n--\n+> Pre-creating index pattern"
-        curl -s -XPOST 'http://localhost:5601/api/saved_objects/index-pattern/candidates-data' \
+        curl -s -XPOST 'http://localhost:5601/api/saved_objects/index-pattern/default-index-pattern' \
           -H 'kbn-xsrf: nevergonnagiveyouup' \
           -H 'Content-Type: application/json' \
-          -d '{"attributes":{"title":"candidates-data","timeFieldName":"CREATE_TS"}}'
+          -d '{"attributes":{"title":"default-index-pattern","timeFieldName":"CREATE_TS"}}'
 
         echo -e "\n--\n+> Opt out of Kibana telemetry"
         curl 'http://localhost:5601/api/telemetry/v2/optIn' \

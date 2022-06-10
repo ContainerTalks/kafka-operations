@@ -61,21 +61,9 @@ docker exec -it broker kafka-topics --list --bootstrap-server broker:90
 
 - Get the consumer messages
 ```
-docker exec -it broker-1  kafka-console-consumer --bootstrap-server 192.31.2.108:19092 --topic candidatesearchindex
+docker exec -it broker-1  kafka-console-consumer --bootstrap-server 192.31.2.108:19092 --topic test_topic
 ```
-### Check the status of the connectors
-
-- List the connectors 
-
-```bash
-curl -X GET "localhost:8083/connectors"
-```
-- Connectors Status
-
-
-- Delete the connector
-
-`curl -X DELETE  "http://localhost:8083/connectors/<CONNECTOR_NAME>"`
+Check the status of the connectors using [Connectos API]()
 
 ## Stream Data from Kafka to Elasticsearch
 

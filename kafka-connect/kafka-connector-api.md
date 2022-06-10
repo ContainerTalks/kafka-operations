@@ -88,3 +88,9 @@ curl 'localhost:8083/connectors/<CONNECTOR_NAME>/restart'
 ```bash
 curl -XPOST 'localhost:8083/connectors/s3-json-to-kafka/restart'
 ```
+
+#### Delete the connector
+
+```bash
+curl -X DELETE  "http://localhost:8083/connectors/<CONNECTOR_NAME>"
+```
