@@ -40,4 +40,6 @@ docker exec -it broker kafka-console-producer --broker-list broker:9092 --topic 
 
 #### Console Consumer
 
+```
 docker exec -it broker  kafka-console-consumer --bootstrap-server broker:9092 --topic test --from-beginning
+```
