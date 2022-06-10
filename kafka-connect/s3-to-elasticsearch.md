@@ -16,17 +16,7 @@
 ```
 - **Destination** : Elasticsearch, it is running as a container configured with docker compose.
 
-# Verify the Connector Plugins
-
-- FIND THE SPECIFIC PLUGINS INSTALLED
-```bash
-curl -s localhost:8083/connector-plugins|jq '.[].class'| egrep 'ElasticsearchSinkConnector'
-```
-
-- FIND ALL THE PLUGINS INSTALLED
-```bash
-curl -s localhost:8083/connector-plugins|jq '.[].class'
-```
+Verify the connector plugins [Connector Plugins API](https://github.com/JinnaBalu/docker-kafka/blob/main/kafka-connect/kafka-connector-plugin-api.md)
 
 ## Stream Data from S3 to Kafka
 
@@ -51,6 +41,9 @@ curl -i -X PUT -H  "Content-Type:application/json" http://localhost:8083/connect
     }'
 ```
 
+Check the status of the connectors using [Connectos API](https://github.com/JinnaBalu/docker-kafka/blob/main/kafka-connect/kafka-connector-api.md)
+
+
 ### Verify the topics
 
 - List the topics
@@ -63,7 +56,7 @@ docker exec -it broker kafka-topics --list --bootstrap-server broker:90
 ```
 docker exec -it broker-1  kafka-console-consumer --bootstrap-server 192.31.2.108:19092 --topic test_topic
 ```
-Check the status of the connectors using [Connectos API]()
+
 
 ## Stream Data from Kafka to Elasticsearch
 
