@@ -24,21 +24,21 @@ Verify the connector plugins [Connector Plugins API](https://github.com/JinnaBal
 
 ```bash
 curl -i -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/s3-json-to-kafka/config -d '{
-        "name": "s3-json-to-kafka",
-        "connector.class": "io.confluent.connect.s3.source.S3SourceConnector",
-        "tasks.max": "1",
-        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
-        "mode": "GENERIC",
-        "topics.dir": "jsonTest",
-        "confluent.topic.bootstrap.servers": "broker:29092",
-        "confluent.topic.replication.factor": "1",
-        "format.class": "io.confluent.connect.s3.format.json.JsonFormat",
-        "topic.regex.list": "test_topic:.*",
-        "s3.bucket.name": "test-kafka-connect-bucket-balu-test",
-        "s3.region": "ap-south-1",
-        "s3.credentials.provider.class": "com.amazonaws.auth.EnvironmentVariableCredentialsProvider",
-        "value.converter.schemas.enable": "false"
-    }'
+    "name": "s3-json-to-kafka",
+    "connector.class": "io.confluent.connect.s3.source.S3SourceConnector",
+    "tasks.max": "1",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "mode": "GENERIC",
+    "topics.dir": "jsonTest",
+    "confluent.topic.bootstrap.servers": "broker:29092",
+    "confluent.topic.replication.factor": "1",
+    "format.class": "io.confluent.connect.s3.format.json.JsonFormat",
+    "topic.regex.list": "test_topic:.*",
+    "s3.bucket.name": "test-kafka-connect-bucket-balu-test",
+    "s3.region": "ap-south-1",
+    "s3.credentials.provider.class": "com.amazonaws.auth.EnvironmentVariableCredentialsProvider",
+    "value.converter.schemas.enable": "false"
+}'
 ```
 
 Check the status of the connectors using [Connectos API](https://github.com/JinnaBalu/docker-kafka/blob/main/kafka-connect/kafka-connector-api.md)
@@ -63,19 +63,17 @@ docker exec -it broker-1  kafka-console-consumer --bootstrap-server 192.31.2.108
 - Create the connector to sync data between kafka to elasticsearch 
 
 ```bash
-curl -i -X PUT -H  "Content-Type:application/json" \
-    http://localhost:8083/connectors/elasticsearch-sink/config \
-    -d '{
-        "name": "elasticsearch-sink",
-        "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
-        "tasks.max": "1",
-        "topics" : "test_topic", 
-        "topic.index.map" : "test_topic:test_topic_index",
-        "connection.url": "http://elasticsearch:9200",
-        "type.name": "log",
-        "key.ignore": "true",
-        "schema.ignore" : "true"
-  }'
+curl -i -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/elasticsearch-sink/config -d '{
+    "name": "elasticsearch-sink",
+    "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+    "tasks.max": "1",
+    "topics" : "test_topic", 
+    "topic.index.map" : "test_topic:test_topic_index",
+    "connection.url": "http://elasticsearch:9200",
+    "type.name": "log",
+    "key.ignore": "true",
+    "schema.ignore" : "true"
+}'
 ```
 
 ## Elasticsearch 
