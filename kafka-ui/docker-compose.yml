@@ -1,0 +1,20 @@
+services:
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8080:8080
+    environment:
+      - DYNAMIC_CONFIG_ENABLED=true
+    volumes:
+      - ./config.yml:/etc/kafkaui/dynamic_config.yaml
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider  http://localhost:8080/actuator/health
+      interval: 30s
+      timeout: 10s
+      retries: 10
+    networks:
+      - kafka
+networks:
+  kafka:
+    external: true
